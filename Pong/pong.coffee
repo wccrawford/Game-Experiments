@@ -5,7 +5,6 @@ class Pong
 		@time = @date.getTime()
 		@framerate = 1000/60
 		@canvas = document.getElementById('canvas')
-		console.log @canvas
 		@context = @canvas.getContext('2d')
 
 		@setup()
