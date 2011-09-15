@@ -1,26 +1,54 @@
 class Pong
 	main: ->
 		@running = true
+
 		@date = new Date
 		@time = @date.getTime()
+		@fpsTime = @date.getTime()
+		@fps = 0
+		@lastFps = 0
+
 		@framerate = 1000/60
+
 		@canvas = document.getElementById('canvas')
 		@context = @canvas.getContext('2d')
+
+		@field = [
+			50,
+			100,
+			@canvas.width - 50,
+			@canvas.height - 50,
+		]
+
+		window.onblur = @pause
+		
+		window.onfocus = @unpause
 
 		@setup()
 
 		@loop()
+
+	pause: =>
+		@running = false
+
+	unpause: =>
+		@running = true
 	
 	loop: ->
-		@update()
+		if @running
+			@update()
 
-		@date = new Date()
-		if ((@date.getTime() - @time) >= @framerate)
-			@draw()
-			@time = @date.getTime()
+			@date = new Date()
+			if ((@date.getTime() - @time) >= @framerate)
+				@draw()
+				@time = @date.getTime()
 
-		if !@running
-			return
+			@fps++
+			if ((@date.getTime() - @fpsTime) >= 1000)
+				@fpsTime = @date.getTime()
+				@lastFps = @fps
+				@fps = 0
+				console.log @lastFps
 
 		setTimeout =>
 			@loop()
@@ -36,21 +64,21 @@ class Pong
 		@ball.location[0] += @ball.direction[0]
 		@ball.location[1] += @ball.direction[1]
 
-		if (@ball.location[0] < 0)
+		if (@ball.location[0] < @field[0])
 			@ball.direction[0] = 0 - @ball.direction[0]
-			@ball.location[0] = 0 - @ball.location[0]
+			@ball.location[0] = @field[0] + (@field[0] - @ball.location[0])
 
-		if (@ball.location[0] > @canvas.width)
+		if (@ball.location[0] > @field[2])
 			@ball.direction[0] = 0 - @ball.direction[0]
-			@ball.location[0] = @canvas.width - (@ball.location[0] - @canvas.width)
+			@ball.location[0] = @field[2] - (@ball.location[0] - @field[2])
 
-		if (@ball.location[1] < 0)
+		if (@ball.location[1] < @field[1])
 			@ball.direction[1] = 0 - @ball.direction[1]
-			@ball.location[1] = 0 - @ball.location[1]
+			@ball.location[1] = @field[1] + (@field[1] - @ball.location[1])
 
-		if (@ball.location[1] > @canvas.height)
+		if (@ball.location[1] > @field[3])
 			@ball.direction[1] = 0 - @ball.direction[1]
-			@ball.location[1] = @canvas.height - (@ball.location[1] - @canvas.height)
+			@ball.location[1] = @field[3] - (@ball.location[1] - @field[3])
 
 	draw: ->
 		@canvas.width = @canvas.width
