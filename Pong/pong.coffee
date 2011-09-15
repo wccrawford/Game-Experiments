@@ -58,32 +58,45 @@ class Pong
 		@paddle1 = new Paddle
 		@paddle2 = new Paddle
 		@paddle2.side = 'right'
-		@ball = new Ball
+		@ball = new Ball 2
 
 	update: ->
 		@ball.location[0] += @ball.direction[0]
 		@ball.location[1] += @ball.direction[1]
 
-		if (@ball.location[0] < @field[0])
+		@left = @field[0] + @ball.size
+		if (@ball.location[0] < @left)
 			@ball.direction[0] = 0 - @ball.direction[0]
-			@ball.location[0] = @field[0] + (@field[0] - @ball.location[0])
+			@ball.location[0] = @left + (@left - @ball.location[0])
 
-		if (@ball.location[0] > @field[2])
+		@right = @field[2] - @ball.size
+		if (@ball.location[0] > @right)
 			@ball.direction[0] = 0 - @ball.direction[0]
-			@ball.location[0] = @field[2] - (@ball.location[0] - @field[2])
+			@ball.location[0] = @right - (@ball.location[0] - @right)
 
-		if (@ball.location[1] < @field[1])
+		@top = @field[1] + @ball.size
+		if (@ball.location[1] < @top)
 			@ball.direction[1] = 0 - @ball.direction[1]
-			@ball.location[1] = @field[1] + (@field[1] - @ball.location[1])
+			@ball.location[1] = @top + (@top - @ball.location[1])
 
-		if (@ball.location[1] > @field[3])
+		@bottom = @field[3] - @ball.size
+		if (@ball.location[1] > @bottom)
 			@ball.direction[1] = 0 - @ball.direction[1]
-			@ball.location[1] = @field[3] - (@ball.location[1] - @field[3])
+			@ball.location[1] = @bottom - (@ball.location[1] - @bottom)
 
 	draw: ->
 		@canvas.width = @canvas.width
 		@context.fillStyle = '#000'
 		@context.fillRect(0, 0, @canvas.width, @canvas.height)
+
+		@context.beginPath()
+		@context.moveTo @field[0], @field[1]
+		@context.lineTo @field[2], @field[1]
+		@context.moveTo @field[0], @field[3]
+		@context.lineTo @field[2], @field[3]
+		@context.closePath()
+		@context.strokeStyle = '#FFF'
+		@context.stroke()
 
 		@paddle1.draw(@context)
 		@paddle2.draw(@context)
@@ -98,13 +111,13 @@ class Paddle
 		
 
 class Ball
-	constructor: ->
+	constructor: (@size) ->
 		@location = [400,300]
 		@direction = [-1,-1]
 
 	draw: (context) ->
 		context.beginPath()
-		context.arc(@location[0], @location[1], 4, 0, Math.PI * 2, false)
+		context.arc(@location[0], @location[1], @size*2, 0, Math.PI * 2, false)
 		context.closePath()
 
 		context.fillStyle = '#FFF'
