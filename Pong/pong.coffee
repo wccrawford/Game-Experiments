@@ -90,10 +90,10 @@ class Pong
 		@context.fillRect(0, 0, @canvas.width, @canvas.height)
 
 		@context.beginPath()
-		@context.moveTo @field[0], @field[1]
-		@context.lineTo @field[2], @field[1]
-		@context.moveTo @field[0], @field[3]
-		@context.lineTo @field[2], @field[3]
+		@context.moveTo @field[0] + 0.5, @field[1] + 0.5
+		@context.lineTo @field[2] + 0.5, @field[1] + 0.5
+		@context.moveTo @field[0] + 0.5, @field[3] + 0.5
+		@context.lineTo @field[2] + 0.5, @field[3] + 0.5
 		@context.closePath()
 		@context.strokeStyle = '#FFF'
 		@context.stroke()
@@ -117,7 +117,7 @@ class Ball
 
 	draw: (context) ->
 		context.beginPath()
-		context.arc(@location[0], @location[1], @size*2, 0, Math.PI * 2, false)
+		context.arc(@location[0] + 0.5, @location[1] + 0.5, @size*2, 0, Math.PI * 2, false)
 		context.closePath()
 
 		context.fillStyle = '#FFF'
