@@ -48,7 +48,6 @@ class Pong
 				@fpsTime = @date.getTime()
 				@lastFps = @fps
 				@fps = 0
-				console.log @lastFps
 
 		setTimeout =>
 			@loop()
