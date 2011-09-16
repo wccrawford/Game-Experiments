@@ -73,20 +73,30 @@ class Pong
 		, 1
 
 	setup: ->
-		midfield = @field[1] + ((@field[3] - @field[1])/2)
+		@midfield = [
+			@field[0] + ((@field[2] - @field[0])/2)
+			@field[1] + ((@field[3] - @field[1])/2)
+		]
+		console.log @midfield
+
 		@paddle1 = new Paddle
-		@paddle1.location = [@field[0]+10, midfield]
+		@paddle1.location = [@field[0]+10, @midfield[1]]
 
 		@paddle2 = new Paddle
-		@paddle2.location = [@field[2]-10, midfield]
+		@paddle2.location = [@field[2]-10, @midfield[1]]
+
 		@ball = new Ball 2
+		@ball.location = [
+			@midfield[0]
+			@midfield[1]
+		]
 
 	update: ->
-		@updateBall()
-
 		@updatePaddle1()
 
 		@updatePaddle2()
+
+		@updateBall()
 	
 	updatePaddle1: ->
 		@paddle1.location[1] -= 1 if @keysDown.indexOf(87) != -1 # w
@@ -95,28 +105,46 @@ class Pong
 		@paddle1.location[1] = @field[1] + 25 if (@paddle1.location[1] < (@field[1] + 25))
 		@paddle1.location[1] = @field[3] - 25 if (@paddle1.location[1] > (@field[3] - 25))
 
+	updatePaddle2: ->
 		@paddle2.location[1] -= 1 if @keysDown.indexOf(38) != -1 # Up
 		@paddle2.location[1] += 1 if @keysDown.indexOf(40) != -1 # Down
 
 		@paddle2.location[1] = @field[1] + 25 if (@paddle2.location[1] < (@field[1] + 25))
 		@paddle2.location[1] = @field[3] - 25 if (@paddle2.location[1] > (@field[3] - 25))
 
-	updatePaddle2: ->
-
 	updateBall: ->
 		@ball.location[0] += @ball.direction[0]
 		@ball.location[1] += @ball.direction[1]
 
-		@left = @field[0] + @ball.size
-		if (@ball.location[0] < @left)
-			@ball.direction[0] = 0 - @ball.direction[0]
-			@ball.location[0] = @left + (@left - @ball.location[0])
+		left = @field[0]
+		if (@ball.location[0] < left)
+			console.log @midfield
+			@ball.location = [
+				@midfield[0]
+				@midfield[1]
+			]
+		
+		right = @field[2]
+		if (@ball.location[0] > right)
+			@ball.location = [
+				@midfield[0]
+				@midfield[1]
+			]
+
+		ballBounds = @ball.boundingBox()
+		if (@ball.collidesWith(@paddle1))
+			paddle1Bounds = @paddle1.boundingBox()
+			paddle1Right = paddle1Bounds[2]
+			@ball.direction[0] = Math.abs(@ball.direction[0])
+			@ball.location[0] += ((paddle1Right - ballBounds[0]) + (@ball.size / 2))
 			@play('hit')
 
-		@right = @field[2] - @ball.size
-		if (@ball.location[0] > @right)
-			@ball.direction[0] = 0 - @ball.direction[0]
-			@ball.location[0] = @right - (@ball.location[0] - @right)
+		ballBounds = @ball.boundingBox()
+		if (@ball.collidesWith(@paddle2))
+			paddle2Bounds = @paddle2.boundingBox()
+			paddle2Left = paddle2Bounds[0]
+			@ball.direction[0] = 0 - Math.abs(@ball.direction[0])
+			@ball.location[0] -= ((ballBounds[2] - paddle2Left) + (@ball.size / 2))
 			@play('hit')
 
 		@top = @field[1] + @ball.size
@@ -154,11 +182,19 @@ class Pong
 class Paddle
 	constructor: ->
 		@location = [60, 300]
+		@size = [10, 50]
 	
 	draw: (context) ->
 		context.fillStyle = '#FFF'
-		context.fillRect(@location[0]-5, @location[1]-25, 10, 50)
-		
+		context.fillRect(@location[0] - (@size[0] / 2), @location[1] - (@size[1] / 2), @size[0], @size[1])
+	
+	boundingBox: ->
+		return [
+			@location[0] - (@size[0] / 2)
+			@location[1] - (@size[1] / 2)
+			@location[0] + (@size[0] / 2)
+			@location[1] + (@size[1] / 2)
+		]
 
 class Ball
 	constructor: (@size) ->
@@ -174,6 +210,31 @@ class Ball
 		context.strokeStyle = '#FFF'
 		context.stroke()
 		context.fill()
+	
+	boundingBox: ->
+		return [
+			@location[0] - (@size / 2)
+			@location[1] - (@size / 2)
+			@location[0] + (@size / 2)
+			@location[1] + (@size / 2)
+		]
+
+	collidesWith: (object) ->
+		ballBounds = @boundingBox()
+		objectBounds = object.boundingBox()
+		
+		if ((ballBounds[0] >= objectBounds[0]) &&
+		(ballBounds[0] <= objectBounds[2])) ||
+		(ballBounds[2] >= objectBounds[0]) &&
+		(ballBounds[2] <= objectBounds[2])
+			if ((ballBounds[1] >= objectBounds[1]) &&
+			(ballBounds[1] <= objectBounds[3])) ||
+			(ballBounds[3] >= objectBounds[1]) &&
+			(ballBounds[3] <= objectBounds[3])
+					return true
+
+		false
+		
 
 pong = new Pong
 pong.main()
