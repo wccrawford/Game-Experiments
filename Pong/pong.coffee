@@ -84,8 +84,17 @@ class Pong
 		@updatePaddle2()
 	
 	updatePaddle1: ->
-		@paddle1.location[1] -= 1 if @keysDown.indexOf(38) != -1 # Up
-		@paddle1.location[1] += 1 if @keysDown.indexOf(40) != -1 # Down
+		@paddle1.location[1] -= 1 if @keysDown.indexOf(87) != -1 # w
+		@paddle1.location[1] += 1 if @keysDown.indexOf(83) != -1 # s
+
+		@paddle1.location[1] = @field[1] + 25 if (@paddle1.location[1] < (@field[1] + 25))
+		@paddle1.location[1] = @field[3] - 25 if (@paddle1.location[1] > (@field[3] - 25))
+
+		@paddle2.location[1] -= 1 if @keysDown.indexOf(38) != -1 # Up
+		@paddle2.location[1] += 1 if @keysDown.indexOf(40) != -1 # Down
+
+		@paddle2.location[1] = @field[1] + 25 if (@paddle2.location[1] < (@field[1] + 25))
+		@paddle2.location[1] = @field[3] - 25 if (@paddle2.location[1] > (@field[3] - 25))
 
 	updatePaddle2: ->
 
