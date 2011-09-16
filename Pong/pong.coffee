@@ -78,7 +78,6 @@ class Pong
 			@field[0] + ((@field[2] - @field[0])/2)
 			@field[1] + ((@field[3] - @field[1])/2)
 		]
-		console.log @midfield
 
 		@paddle1 = new Paddle
 		@paddle1.location = [@field[0]+10, @midfield[1]]
@@ -119,7 +118,6 @@ class Pong
 
 		left = @field[0]
 		if (@ball.location[0] < left)
-			console.log @midfield
 			@ball.location = [
 				@midfield[0]
 				@midfield[1]
