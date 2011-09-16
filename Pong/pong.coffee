@@ -7,6 +7,7 @@ class Pong
 		@fpsTime = @date.getTime()
 		@fps = 0
 		@lastFps = 0
+		@keysDown = []
 
 		@framerate = 1000/60
 
@@ -24,6 +25,10 @@ class Pong
 		
 		window.onfocus = @unpause
 
+		document.onkeydown = @getKeys
+
+		document.onkeyup = @clearKeys
+
 		@setup()
 
 		@loop()
@@ -34,6 +39,15 @@ class Pong
 	unpause: =>
 		@running = true
 	
+	getKeys: (event) =>
+		if @keysDown.indexOf(event.keyCode) == -1
+			@keysDown.push event.keyCode
+	
+	clearKeys: (event) =>
+		index = @keysDown.indexOf(event.keyCode)
+		if index != -1
+			@keysDown[index..index] = []
+
 	loop: ->
 		if @running
 			@update()
@@ -54,12 +68,28 @@ class Pong
 		, 1
 
 	setup: ->
+		midfield = @field[1] + ((@field[3] - @field[1])/2)
 		@paddle1 = new Paddle
+		@paddle1.location = [@field[0]+10, midfield]
+
 		@paddle2 = new Paddle
-		@paddle2.side = 'right'
+		@paddle2.location = [@field[2]-10, midfield]
 		@ball = new Ball 2
 
 	update: ->
+		@updateBall()
+
+		@updatePaddle1()
+
+		@updatePaddle2()
+	
+	updatePaddle1: ->
+		@paddle1.location[1] -= 1 if @keysDown.indexOf(38) != -1 # Up
+		@paddle1.location[1] += 1 if @keysDown.indexOf(40) != -1 # Down
+
+	updatePaddle2: ->
+
+	updateBall: ->
 		@ball.location[0] += @ball.direction[0]
 		@ball.location[1] += @ball.direction[1]
 
@@ -103,10 +133,11 @@ class Pong
 
 class Paddle
 	constructor: ->
-		@side = 'left'
-		@location = 50
+		@location = [60, 300]
 	
 	draw: (context) ->
+		context.fillStyle = '#FFF'
+		context.fillRect(@location[0]-5, @location[1]-25, 10, 50)
 		
 
 class Ball
