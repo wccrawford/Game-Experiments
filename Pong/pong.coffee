@@ -1,7 +1,5 @@
 class Pong
 	main: ->
-		@running = true
-
 		@date = new Date
 		@time = @date.getTime()
 		@fpsTime = @date.getTime()
@@ -23,7 +21,7 @@ class Pong
 
 		window.onblur = @pause
 		
-		window.onfocus = @unpause
+		window.onfocus = @start
 
 		document.onkeydown = @getKeys
 
@@ -34,11 +32,16 @@ class Pong
 		@loop()
 
 	pause: =>
-		@running = false
+		if (@loopRef != null) 
+			clearTimeout(@loopRef)
+			@loopRef = null
 
-	unpause: =>
-		@running = true
-	
+	start: =>
+		if(@loopRef == null)
+			@loopRef = setTimeout =>
+				@loop()
+			, 1
+
 	getKeys: (event) =>
 		if @keysDown.indexOf(event.keyCode) == -1
 			@keysDown.push event.keyCode
@@ -49,21 +52,20 @@ class Pong
 			@keysDown[index..index] = []
 
 	loop: ->
-		if @running
-			@update()
+		@update()
 
-			@date = new Date()
-			if ((@date.getTime() - @time) >= @framerate)
-				@draw()
-				@time = @date.getTime()
+		@date = new Date()
+		if ((@date.getTime() - @time) >= @framerate)
+			@draw()
+			@time = @date.getTime()
 
-			@fps++
-			if ((@date.getTime() - @fpsTime) >= 1000)
-				@fpsTime = @date.getTime()
-				@lastFps = @fps
-				@fps = 0
+		@fps++
+		if ((@date.getTime() - @fpsTime) >= 1000)
+			@fpsTime = @date.getTime()
+			@lastFps = @fps
+			@fps = 0
 
-		setTimeout =>
+		@loopRef = setTimeout =>
 			@loop()
 		, 1
 
