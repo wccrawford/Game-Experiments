@@ -9,6 +9,7 @@ class Pong
 		@audio = {
 			hit: document.getElementById('hit')
 		}
+		@score = [0, 0]
 
 		@framerate = 1000/60
 
@@ -123,6 +124,7 @@ class Pong
 				@midfield[0]
 				@midfield[1]
 			]
+			@score[1]++
 		
 		right = @field[2]
 		if (@ball.location[0] > right)
@@ -130,6 +132,7 @@ class Pong
 				@midfield[0]
 				@midfield[1]
 			]
+			@score[0]++
 
 		ballBounds = @ball.boundingBox()
 		if (@ball.collidesWith(@paddle1))
@@ -178,6 +181,16 @@ class Pong
 		@paddle1.draw(@context)
 		@paddle2.draw(@context)
 		@ball.draw(@context)
+
+		@context.font = "25px Arial"
+		@context.textBaseline = "top"
+		@context.textAlign = "right"
+		@context.fillText("Left Player", (@canvas.width / 2) - 10, 10)
+		@context.fillText(@score[0], (@canvas.width / 2) - 10, 40)
+
+		@context.textAlign = "left"
+		@context.fillText("Right Player", (@canvas.width / 2) + 10, 10)
+		@context.fillText(@score[1], (@canvas.width / 2) + 10, 40)
 
 class Paddle
 	constructor: ->
