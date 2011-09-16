@@ -6,6 +6,9 @@ class Pong
 		@fps = 0
 		@lastFps = 0
 		@keysDown = []
+		@audio = {
+			hit: document.getElementById('hit')
+		}
 
 		@framerate = 1000/60
 
@@ -32,7 +35,7 @@ class Pong
 		@loop()
 
 	pause: =>
-		if (@loopRef != null) 
+		if (@loopRef != null)
 			clearTimeout(@loopRef)
 			@loopRef = null
 
@@ -108,11 +111,13 @@ class Pong
 		if (@ball.location[0] < @left)
 			@ball.direction[0] = 0 - @ball.direction[0]
 			@ball.location[0] = @left + (@left - @ball.location[0])
+			@play('hit')
 
 		@right = @field[2] - @ball.size
 		if (@ball.location[0] > @right)
 			@ball.direction[0] = 0 - @ball.direction[0]
 			@ball.location[0] = @right - (@ball.location[0] - @right)
+			@play('hit')
 
 		@top = @field[1] + @ball.size
 		if (@ball.location[1] < @top)
@@ -124,6 +129,10 @@ class Pong
 			@ball.direction[1] = 0 - @ball.direction[1]
 			@ball.location[1] = @bottom - (@ball.location[1] - @bottom)
 
+	play: (sound) ->
+		if(@audio[sound] != undefined)
+			@audio[sound].play()
+	
 	draw: ->
 		@canvas.width = @canvas.width
 		@context.fillStyle = '#000'
