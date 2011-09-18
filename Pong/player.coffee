@@ -1,5 +1,4 @@
 class @Player
-
 	constructor: ->
 		@keys = {
 			up: 87 # w
@@ -8,7 +7,7 @@ class @Player
 
 		@rate = 1
 
-	update: (keysDown) ->
+	update: (keysDown, paddlePosition, ballPosition, ballDirection) ->
 		distance = 0
 		distance = @rate if @keyDown('down', keysDown)
 		distance = (0 - @rate) if @keyDown('up', keysDown)

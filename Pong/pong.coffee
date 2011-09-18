@@ -105,13 +105,13 @@ class @Pong
 		@updateBall()
 	
 	updatePaddle1: ->
-		@paddle1.location[1] += @player1.update(@keysDown)
+		@paddle1.location[1] += @player1.update(@keysDown, @paddle1.location, @ball.location, @ball.direction)
 
 		@paddle1.location[1] = @field[1] + 25 if (@paddle1.location[1] < (@field[1] + 25))
 		@paddle1.location[1] = @field[3] - 25 if (@paddle1.location[1] > (@field[3] - 25))
 
 	updatePaddle2: ->
-		@paddle2.location[1] += @player2.update(@keysDown)
+		@paddle2.location[1] += @player2.update(@keysDown, @paddle2.location, @ball.location, @ball.direction)
 
 		@paddle2.location[1] = @field[1] + 25 if (@paddle2.location[1] < (@field[1] + 25))
 		@paddle2.location[1] = @field[3] - 25 if (@paddle2.location[1] > (@field[3] - 25))

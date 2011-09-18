@@ -1,7 +1,7 @@
 class @Ball
 	constructor: (@size) ->
 		@location = [400, 300]
-		@direction = [-1, -1]
+		@direction = [-1.5, -1.5]
 
 	draw: (context) ->
 		context.beginPath()
