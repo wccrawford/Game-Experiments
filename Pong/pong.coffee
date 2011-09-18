@@ -14,7 +14,6 @@ class @Pong
 		@framerate = 1000/60
 
 		@canvas = document.getElementById('canvas')
-		@context = @canvas.getContext('2d')
 
 		@field = [
 			50,
@@ -56,18 +55,18 @@ class @Pong
 			@keysDown[index..index] = []
 
 	loop: ->
-		@update()
-
 		@date = new Date()
 		if ((@date.getTime() - @time) >= @framerate)
-			@draw()
-			@time = @date.getTime()
+			@draw(@canvas.getContext('2d'))
+			@time += @framerate
 
-		@fps++
-		if ((@date.getTime() - @fpsTime) >= 1000)
-			@fpsTime = @date.getTime()
-			@lastFps = @fps
-			@fps = 0
+			@fps++
+			if ((@date.getTime() - @fpsTime) >= 1000)
+				@fpsTime += 1000
+				@lastFps = @fps
+				@fps = 0
+
+		@update()
 
 		@loopRef = setTimeout =>
 			@loop()
@@ -162,33 +161,37 @@ class @Pong
 		if(@audio[sound] != undefined)
 			@audio[sound].play()
 	
-	draw: ->
+	draw: (context) ->
 		@canvas.width = @canvas.width
-		@context.fillStyle = '#000'
-		@context.fillRect(0, 0, @canvas.width, @canvas.height)
+		context.fillStyle = '#000'
+		context.fillRect(0, 0, @canvas.width, @canvas.height)
 
-		@context.beginPath()
-		@context.moveTo @field[0] + 0.5, @field[1] + 0.5
-		@context.lineTo @field[2] + 0.5, @field[1] + 0.5
-		@context.moveTo @field[0] + 0.5, @field[3] + 0.5
-		@context.lineTo @field[2] + 0.5, @field[3] + 0.5
-		@context.closePath()
-		@context.strokeStyle = '#FFF'
-		@context.stroke()
+		context.beginPath()
+		context.moveTo @field[0] + 0.5, @field[1] + 0.5
+		context.lineTo @field[2] + 0.5, @field[1] + 0.5
+		context.moveTo @field[0] + 0.5, @field[3] + 0.5
+		context.lineTo @field[2] + 0.5, @field[3] + 0.5
+		context.closePath()
+		context.strokeStyle = '#FFF'
+		context.stroke()
 
-		@paddle1.draw(@context)
-		@paddle2.draw(@context)
-		@ball.draw(@context)
+		@paddle1.draw(context)
+		@paddle2.draw(context)
+		@ball.draw(context)
 
-		@context.font = "25px Arial"
-		@context.textBaseline = "top"
-		@context.textAlign = "right"
-		@context.fillText("Left Player", (@canvas.width / 2) - 10, 10)
-		@context.fillText(@score[0], (@canvas.width / 2) - 10, 40)
+		context.font = "25px Arial"
+		context.textBaseline = "top"
+		context.textAlign = "right"
+		context.fillText("Left Player", (@canvas.width / 2) - 10, 10)
+		context.fillText(@score[0], (@canvas.width / 2) - 10, 40)
 
-		@context.textAlign = "left"
-		@context.fillText("Right Player", (@canvas.width / 2) + 10, 10)
-		@context.fillText(@score[1], (@canvas.width / 2) + 10, 40)
+		context.textAlign = "left"
+		context.fillText("Right Player", (@canvas.width / 2) + 10, 10)
+		context.fillText(@score[1], (@canvas.width / 2) + 10, 40)
+
+		context.textAlign = "right"
+		context.textBaseline = "bottom"
+		context.fillText(@lastFps, @canvas.width - 1, @canvas.height - 1)
 
 
 pong = new Pong
