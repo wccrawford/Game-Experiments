@@ -191,7 +191,7 @@ class @Pong
 
 		context.textAlign = "right"
 		context.textBaseline = "bottom"
-		context.fillText(@lastFps, @canvas.width - 1, @canvas.height - 1)
+		context.fillText(@lastFps + ' fps', @canvas.width - 1, @canvas.height - 1)
 
 
 pong = new Pong
