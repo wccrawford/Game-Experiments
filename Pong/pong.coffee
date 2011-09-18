@@ -140,7 +140,9 @@ class @Pong
 		if (@ball.collidesWith(@paddle1))
 			paddle1Bounds = @paddle1.boundingBox()
 			paddle1Right = paddle1Bounds[2]
-			@ball.direction[0] = Math.abs(@ball.direction[0])
+
+			@ball.direction = @calculateBallDirection(@ball, @paddle1)
+
 			@ball.location[0] += ((paddle1Right - ballBounds[0]) + (@ball.size / 2))
 			@play('hit')
 
@@ -148,7 +150,9 @@ class @Pong
 		if (@ball.collidesWith(@paddle2))
 			paddle2Bounds = @paddle2.boundingBox()
 			paddle2Left = paddle2Bounds[0]
-			@ball.direction[0] = 0 - Math.abs(@ball.direction[0])
+
+			@ball.direction = @calculateBallDirection(@ball, @paddle2)
+
 			@ball.location[0] -= ((ballBounds[2] - paddle2Left) + (@ball.size / 2))
 			@play('hit')
 
@@ -161,6 +165,19 @@ class @Pong
 		if (@ball.location[1] > @bottom)
 			@ball.direction[1] = 0 - @ball.direction[1]
 			@ball.location[1] = @bottom - (@ball.location[1] - @bottom)
+
+	calculateBallDirection: (ball, paddle) ->
+		direction = [
+			(paddle.size[1]) - Math.abs(ball.location[1] - paddle.location[1])
+			(ball.location[1] - paddle.location[1])
+		]
+		length = Math.sqrt((direction[0]*direction[0]) + (direction[1]*direction[1]))
+		direction[0] = Math.abs(direction[0] / length * 2)
+		direction[1] = direction[1] / length * 2
+
+		direction[0] = -1 * direction[0] if (ball.location[0] < paddle.location[0])
+
+		return direction
 
 	play: (sound) ->
 		if(@audio[sound] != undefined)
