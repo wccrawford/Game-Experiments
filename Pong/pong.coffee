@@ -78,6 +78,13 @@ class @Pong
 			@field[1] + ((@field[3] - @field[1])/2)
 		]
 
+		@player1 = new Player
+		@player2 = new Player
+		@player2.keys = {
+			up: 38
+			down: 40
+		}
+
 		@paddle1 = new Paddle
 		@paddle1.location = [@field[0]+10, @midfield[1]]
 
@@ -98,15 +105,13 @@ class @Pong
 		@updateBall()
 	
 	updatePaddle1: ->
-		@paddle1.location[1] -= 1 if @keysDown.indexOf(87) != -1 # w
-		@paddle1.location[1] += 1 if @keysDown.indexOf(83) != -1 # s
+		@paddle1.location[1] += @player1.update(@keysDown)
 
 		@paddle1.location[1] = @field[1] + 25 if (@paddle1.location[1] < (@field[1] + 25))
 		@paddle1.location[1] = @field[3] - 25 if (@paddle1.location[1] > (@field[3] - 25))
 
 	updatePaddle2: ->
-		@paddle2.location[1] -= 1 if @keysDown.indexOf(38) != -1 # Up
-		@paddle2.location[1] += 1 if @keysDown.indexOf(40) != -1 # Down
+		@paddle2.location[1] += @player2.update(@keysDown)
 
 		@paddle2.location[1] = @field[1] + 25 if (@paddle2.location[1] < (@field[1] + 25))
 		@paddle2.location[1] = @field[3] - 25 if (@paddle2.location[1] > (@field[3] - 25))
