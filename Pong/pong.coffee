@@ -1,18 +1,26 @@
 class @Pong
-	main: ->
+	constructor: ->
 		@date = new Date
 		@time = @date.getTime()
 		@fpsTime = @date.getTime()
 		@fps = 0
 		@lastFps = 0
 		@keysDown = []
-		@audio = {
-			hit: document.getElementById('hit')
-		}
 		@score = [0, 0]
+		@modes = []
+		@audio = {}
 
 		@framerate = 1000/60
 
+	main: ->
+		@setup()
+
+		@loop()
+
+	setup: ->
+		@audio = {
+			hit: document.getElementById('hit')
+		}
 		@canvas = document.getElementById('canvas')
 
 		@field = [
@@ -30,49 +38,6 @@ class @Pong
 
 		document.onkeyup = @clearKeys
 
-		@setup()
-
-		@loop()
-
-	pause: =>
-		if (@loopRef != null)
-			clearTimeout(@loopRef)
-			@loopRef = null
-
-	start: =>
-		if(@loopRef == null)
-			@loopRef = setTimeout =>
-				@loop()
-			, 1
-
-	getKeys: (event) =>
-		if @keysDown.indexOf(event.keyCode) == -1
-			@keysDown.push event.keyCode
-	
-	clearKeys: (event) =>
-		index = @keysDown.indexOf(event.keyCode)
-		if index != -1
-			@keysDown[index..index] = []
-
-	loop: ->
-		@date = new Date()
-		if ((@date.getTime() - @time) >= @framerate)
-			@draw(@canvas.getContext('2d'))
-			@time += @framerate
-
-			@fps++
-			if ((@date.getTime() - @fpsTime) >= 1000)
-				@fpsTime += 1000
-				@lastFps = @fps
-				@fps = 0
-
-		@update()
-
-		@loopRef = setTimeout =>
-			@loop()
-		, 1
-
-	setup: ->
 		@midfield = [
 			@field[0] + ((@field[2] - @field[0])/2)
 			@field[1] + ((@field[3] - @field[1])/2)
@@ -97,123 +62,52 @@ class @Pong
 			@midfield[1]
 		]
 
-	update: ->
-		@updatePaddle1()
-
-		@updatePaddle2()
-
-		@updateBall()
+		@modes.push new PlayMode this
 	
-	updatePaddle1: ->
-		@paddle1.location[1] += @player1.update(@keysDown, @paddle1.location, @ball.location, @ball.direction)
+	pause: =>
+		if (@loopRef != null)
+			clearTimeout(@loopRef)
+			@loopRef = null
 
-		@paddle1.location[1] = @field[1] + 25 if (@paddle1.location[1] < (@field[1] + 25))
-		@paddle1.location[1] = @field[3] - 25 if (@paddle1.location[1] > (@field[3] - 25))
+	start: =>
+		if(@loopRef == null)
+			@loopRef = setTimeout =>
+				@loop()
+			, 1
 
-	updatePaddle2: ->
-		@paddle2.location[1] += @player2.update(@keysDown, @paddle2.location, @ball.location, @ball.direction)
+	getKeys: (event) =>
+		if @keysDown.indexOf(event.keyCode) == -1
+			@keysDown.push event.keyCode
+	
+	clearKeys: (event) =>
+		index = @keysDown.indexOf(event.keyCode)
+		if index != -1
+			@keysDown[index..index] = []
 
-		@paddle2.location[1] = @field[1] + 25 if (@paddle2.location[1] < (@field[1] + 25))
-		@paddle2.location[1] = @field[3] - 25 if (@paddle2.location[1] > (@field[3] - 25))
+	loop: ->
+		@date = new Date()
+		if ((@date.getTime() - @time) >= @framerate)
+			@getCurrentMode().draw(@canvas)
+			@time += @framerate
 
-	updateBall: ->
-		@ball.location[0] += @ball.direction[0]
-		@ball.location[1] += @ball.direction[1]
+			@fps++
+			if ((@date.getTime() - @fpsTime) >= 1000)
+				@fpsTime += 1000
+				@lastFps = @fps
+				@fps = 0
 
-		left = @field[0]
-		if (@ball.location[0] < left)
-			@ball.location = [
-				@midfield[0]
-				@midfield[1]
-			]
-			@score[1]++
-		
-		right = @field[2]
-		if (@ball.location[0] > right)
-			@ball.location = [
-				@midfield[0]
-				@midfield[1]
-			]
-			@score[0]++
+		@getCurrentMode().update(@keysDown)
 
-		ballBounds = @ball.boundingBox()
-		if (@ball.collidesWith(@paddle1))
-			paddle1Bounds = @paddle1.boundingBox()
-			paddle1Right = paddle1Bounds[2]
+		@loopRef = setTimeout =>
+			@loop()
+		, 1
 
-			@ball.direction = @calculateBallDirection(@ball, @paddle1)
-
-			@ball.location[0] += ((paddle1Right - ballBounds[0]) + (@ball.size / 2))
-			@play('hit')
-
-		ballBounds = @ball.boundingBox()
-		if (@ball.collidesWith(@paddle2))
-			paddle2Bounds = @paddle2.boundingBox()
-			paddle2Left = paddle2Bounds[0]
-
-			@ball.direction = @calculateBallDirection(@ball, @paddle2)
-
-			@ball.location[0] -= ((ballBounds[2] - paddle2Left) + (@ball.size / 2))
-			@play('hit')
-
-		@top = @field[1] + @ball.size
-		if (@ball.location[1] < @top)
-			@ball.direction[1] = 0 - @ball.direction[1]
-			@ball.location[1] = @top + (@top - @ball.location[1])
-
-		@bottom = @field[3] - @ball.size
-		if (@ball.location[1] > @bottom)
-			@ball.direction[1] = 0 - @ball.direction[1]
-			@ball.location[1] = @bottom - (@ball.location[1] - @bottom)
-
-	calculateBallDirection: (ball, paddle) ->
-		direction = [
-			(paddle.size[1]) - Math.abs(ball.location[1] - paddle.location[1])
-			(ball.location[1] - paddle.location[1])
-		]
-		length = Math.sqrt((direction[0]*direction[0]) + (direction[1]*direction[1]))
-		direction[0] = Math.abs(direction[0] / length * 2)
-		direction[1] = direction[1] / length * 2
-
-		direction[0] = -1 * direction[0] if (ball.location[0] < paddle.location[0])
-
-		return direction
+	getCurrentMode: ->
+		if @modes.length > 0 then @modes[@modes.length - 1] else null
 
 	play: (sound) ->
 		if(@audio[sound] != undefined)
 			@audio[sound].play()
-	
-	draw: (context) ->
-		@canvas.width = @canvas.width
-		context.fillStyle = '#000'
-		context.fillRect(0, 0, @canvas.width, @canvas.height)
-
-		context.beginPath()
-		context.moveTo @field[0] + 0.5, @field[1] + 0.5
-		context.lineTo @field[2] + 0.5, @field[1] + 0.5
-		context.moveTo @field[0] + 0.5, @field[3] + 0.5
-		context.lineTo @field[2] + 0.5, @field[3] + 0.5
-		context.closePath()
-		context.strokeStyle = '#FFF'
-		context.stroke()
-
-		@paddle1.draw(context)
-		@paddle2.draw(context)
-		@ball.draw(context)
-
-		context.font = "25px Arial"
-		context.textBaseline = "top"
-		context.textAlign = "right"
-		context.fillText("Left Player", (@canvas.width / 2) - 10, 10)
-		context.fillText(@score[0], (@canvas.width / 2) - 10, 40)
-
-		context.textAlign = "left"
-		context.fillText("Right Player", (@canvas.width / 2) + 10, 10)
-		context.fillText(@score[1], (@canvas.width / 2) + 10, 40)
-
-		context.textAlign = "right"
-		context.textBaseline = "bottom"
-		context.fillText(@lastFps + ' fps', @canvas.width - 1, @canvas.height - 1)
 
 
 pong = new Pong
