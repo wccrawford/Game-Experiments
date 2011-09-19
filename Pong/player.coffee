@@ -1,5 +1,5 @@
 class @Player
-	constructor: ->
+	constructor: (@name) ->
 		@keys = {
 			up: 87 # w
 			down: 83 # s

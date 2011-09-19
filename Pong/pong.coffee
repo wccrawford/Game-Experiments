@@ -43,8 +43,8 @@ class @Pong
 			@field[1] + ((@field[3] - @field[1])/2)
 		]
 
-		@player1 = new Player
-		@player2 = new Player
+		@player1 = new Player('Left Player')
+		@player2 = new Player('Right Player')
 		@player2.keys = {
 			up: 38
 			down: 40

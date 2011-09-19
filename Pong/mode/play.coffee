@@ -3,6 +3,8 @@ class @PlayMode
 		@field = @main.field
 		@midfield = @main.midfield
 
+		@main.score = [0,0]
+
 	update: (keysDown) ->
 		paddle1 = @main.paddle1
 		paddle2 = @main.paddle2
@@ -67,6 +69,14 @@ class @PlayMode
 			ball.direction[1] = 0 - ball.direction[1]
 			ball.location[1] = bottom - (ball.location[1] - bottom)
 
+		if(@main.score[0] >= 7)
+			@main.modes.pop
+			@main.modes.push new GameOverMode(@main, @main.player1.name)
+
+		if(@main.score[1] >= 7)
+			@main.modes.pop
+			@main.modes.push new GameOverMode(@main, @main.player2.name)
+
 	calculateBallDirection: (ball, paddle) ->
 		direction = [
 			(paddle.size[1]) - Math.abs(ball.location[1] - paddle.location[1])
@@ -107,11 +117,11 @@ class @PlayMode
 		context.font = "25px Arial"
 		context.textBaseline = "top"
 		context.textAlign = "right"
-		context.fillText("Left Player", (canvas.width / 2) - 10, 10)
+		context.fillText(@main.player1.name, (canvas.width / 2) - 10, 10)
 		context.fillText(@main.score[0], (canvas.width / 2) - 10, 40)
 
 		context.textAlign = "left"
-		context.fillText("Right Player", (canvas.width / 2) + 10, 10)
+		context.fillText(@main.player2.name, (canvas.width / 2) + 10, 10)
 		context.fillText(@main.score[1], (canvas.width / 2) + 10, 40)
 
 		context.textAlign = "right"
