@@ -1,11 +1,11 @@
-class @TitleMode
+class @Mode.Title
 	constructor: (@main) ->
 		@keys = {
 			start: 32 # space
 		}
 
 	update: (keysDown) ->
-		@main.modes.push new PlayMode(@main) if @keyDown('start', keysDown)
+		@main.modes.push new Mode.Play(@main) if @keyDown('start', keysDown)
 
 	draw: (canvas) ->
 		context = canvas.getContext('2d')

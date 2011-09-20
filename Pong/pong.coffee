@@ -62,7 +62,7 @@ class @Pong
 			@midfield[1]
 		]
 
-		@modes.push new TitleMode this
+		@modes.push new Mode.Title this
 	
 	pause: =>
 		if (@loopRef != null)

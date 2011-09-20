@@ -1,4 +1,4 @@
-class @PlayMode
+class @Mode.Play
 	constructor: (@main) ->
 		@field = @main.field
 		@midfield = @main.midfield
@@ -71,11 +71,11 @@ class @PlayMode
 
 		if(@main.score[0] >= 7)
 			@main.modes.pop
-			@main.modes.push new GameOverMode(@main, @main.player1.name)
+			@main.modes.push new Mode.GameOver(@main, @main.player1.name)
 
 		if(@main.score[1] >= 7)
 			@main.modes.pop
-			@main.modes.push new GameOverMode(@main, @main.player2.name)
+			@main.modes.push new Mode.GameOver(@main, @main.player2.name)
 
 	calculateBallDirection: (ball, paddle) ->
 		direction = [

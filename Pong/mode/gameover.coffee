@@ -1,4 +1,4 @@
-class @GameOverMode
+class @Mode.GameOver
 	constructor: (@main, @winnerName) ->
 		@keys = {
 			start: 32 # space
@@ -6,7 +6,7 @@ class @GameOverMode
 
 	update: (keysDown) ->
 		@main.modes.pop
-		@main.modes.push new PlayMode(@main) if @keyDown('start', keysDown)
+		@main.modes.push new Mode.Play(@main) if @keyDown('start', keysDown)
 
 	draw: (canvas) ->
 		context = canvas.getContext('2d')
